@@ -69,7 +69,50 @@
 				if (DEBUG) console.log("balance : ", balance + " ETH");
 				$('#message').text(" balance: " + balance + " ETH");
 						})
+					
+
+					$('#sendCoin').on('click', async function () {
+						$('#sendCoin').on('click', async function () {
+			
+			let fromaddress = $("#fromaddress").val();
+			let toaddress = $("#toaddress").val();
+			let amount = $("#mycoin").val();
+			let myPrivateKey = $("#mypasswd").val();
+			
+			
+			const privateKey = Buffer.from(myPrivateKey, 'hex');
+			if (DEBUG) console.log("privateKey: ", privateKey);
+
+			web3.eth.getTransactionCount(fromaddress, (err, txCount) => {
+			// Build the transaction
+			const txObject = {
+			nonce: web3.utils.toHex(txCount),
+			to: toaddress,
+			value: web3.utils.toHex(web3.utils.toWei(amount, 'ether')),
+			gasLimit: web3.utils.toHex(21000),
+			gasPrice: web3.utils.toHex(web3.utils.toWei('10', 'gwei'))
+			 }
+
+			 // Sign the transaction
+			 const tx = new ethereumjs.Tx(txObject);
+			 tx.sign(privateKey);
+
+			 const serializedTx = tx.serialize()
+			 const raw = '0x' + serializedTx.toString('hex')
+
+			 // Broadcast the transaction
+			 web3.eth.sendSignedTransaction(raw, (err, txHash) => {
+			console.log('txHash:', txHash)
+			  // Now go check etherscan to see the transaction!
+			  })
+			})  // end of txbuilder
+			
+			
+			})
+						
 					})
+			
+			})
     </script>
   </head>
 
@@ -81,8 +124,12 @@
       <div id="tablePlace"></div>
       <button id="newAccount">계정 생성하기</button>
       <button id="getBalance">잔액 조회하기</button>
+      <button id="sendCoin">전송하기</button>
 
-			<h5>송신처 <input id="fromaddress" size="45" placeholder=""></input> </h5>
+			<h5>송신처 <input id="fromaddress" size="45" value="0xd8261AE6c16797248fb8cF624A9827a4256e44bc" placeholder="보내는 계정"></input> </h5>
+			<h5>수신처 <input id="toaddress" size="45" value="" placeholder="받는 계정"></input> </h5>
+			<h5>코인 <input id="mycoin" size="45" value="" placeholder="보내는 코인"></input> </h5>
+			<h5>비밀번호 <input id="mypasswd" type="password" size="45" value="3276a55b7e577a213eae03b4c2c9f3fb2b8aaa2eaaca17184394d9ec7e4cf7db" placeholder="비밀번호"></input> </h5>
     </div>
     <br />
     <br />
@@ -94,7 +141,7 @@
     <footer class="py-5 bg-dark">
       <div class="container">
         <p class="m-0 text-center text-white">
-          <b>copyright ⓒ Sunstar, Since 2015 . All Rights Reserved. </b>
+          <b>copyright ⓒ Tester, Since 2021 . All Rights Reserved. </b>
         </p>
       </div>
     </footer>
